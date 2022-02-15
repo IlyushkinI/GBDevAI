@@ -7,6 +7,7 @@ public class Enemy : IEnemy
     private int _moneyPlayer;
     private int _healthPlayer;
     private int _powerPlayer;
+    private int _crimePlayer;
 
     public Enemy(string name)
     {
@@ -28,6 +29,10 @@ public class Enemy : IEnemy
             case DataType.Power:
                 _powerPlayer = dataPlayer.CountPower;
                 break;
+
+            case DataType.Crime:
+                _crimePlayer = dataPlayer.CountCrime;
+                break;
         }
 
         Debug.Log($"Update {_name}, change {dataType}");
@@ -37,7 +42,7 @@ public class Enemy : IEnemy
     {
         get
         {
-            var power = _moneyPlayer + _healthPlayer - _powerPlayer;
+            var power = _moneyPlayer + _healthPlayer - _powerPlayer - _crimePlayer;
             return power;
         }
     }
