@@ -2,5 +2,7 @@
 {
     Money,
     Health,
-    Power
+    Power,
+    Crime,
+    Attack
 }
