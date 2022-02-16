@@ -3,15 +3,17 @@
 public class Enemy : IEnemy
 {
     private string _name;
+    private int _startEnemyPower = 10;  
 
     private int _moneyPlayer;
     private int _healthPlayer;
     private int _powerPlayer;
     private int _crimePlayer;
 
-    public Enemy(string name)
+    public Enemy(string name, int startEnemyPower)
     {
         _name = name;
+        _startEnemyPower = startEnemyPower;
     }
 
     public void Update(DataPlayer dataPlayer, DataType dataType)
@@ -42,7 +44,9 @@ public class Enemy : IEnemy
     {
         get
         {
-            var power = _moneyPlayer + _healthPlayer - _powerPlayer - _crimePlayer;
+            var power = _startEnemyPower + _moneyPlayer + _healthPlayer - _powerPlayer - _crimePlayer;
+            if (power < 0)
+                power = 0;
             return power;
         }
     }

@@ -10,6 +10,8 @@ public class FightWindowView : MonoBehaviour
     [SerializeField] private TMP_Text _countCrimeRateText;
     [SerializeField] private TMP_Text _countPowerEnemyText;
     [SerializeField] private TMP_Text _fightResult;
+    [SerializeField] private TMP_Text _attackTypePlayerText;
+    [SerializeField] private TMP_Text _attackTypeEnemyText;
 
     [SerializeField] private Button _addMoneyButton;
     [SerializeField] private Button _minusMoneyButton;
@@ -36,11 +38,16 @@ public class FightWindowView : MonoBehaviour
     private int _allCountHealthPlayer;
     private int _allCountPowerPlayer;
     private int _allCrimeRate;
+    private AttackType _playerAttackType = AttackType.None;
+
     private const int _maxCrimeRate = 5;
+    private const int _startEnemyPower = 10;
+    private const int _crimeRateValueToLoseOpportunityToMissTheFight = 2;  // зато понятно =)
 
     private void Start()
     {
-        _enemy = new Enemy("Flappy");
+        _enemy = new Enemy("Flappy", _startEnemyPower);
+        _countPowerEnemyText.text = $"Enemy Power: {_enemy.Power}";
 
         _money = new Money(nameof(Money));
         _money.Attach(_enemy);
@@ -66,7 +73,10 @@ public class FightWindowView : MonoBehaviour
         _addCrimeRate.onClick.AddListener(() => ChangeCrimeRate(true));
         _minusCrimeRate.onClick.AddListener(() => ChangeCrimeRate(false));
 
-        _fightButton.onClick.AddListener(Fight);
+        _setKnife.onClick.AddListener(() => ChangeAttackType(AttackType.Knife));
+        _setGun.onClick.AddListener(() => ChangeAttackType(AttackType.Gun));
+
+        _fightButton.onClick.AddListener(() => Fight(_playerAttackType));
         _skipButton.onClick.AddListener(Skip);
     }
 
@@ -84,6 +94,9 @@ public class FightWindowView : MonoBehaviour
         _addCrimeRate.onClick.RemoveAllListeners();
         _minusCrimeRate.onClick.RemoveAllListeners();
 
+        _setKnife.onClick.RemoveAllListeners();
+        _setGun.onClick.RemoveAllListeners();
+
         _fightButton.onClick.RemoveAllListeners();
 
         _money.Detach(_enemy);
@@ -91,9 +104,20 @@ public class FightWindowView : MonoBehaviour
         _power.Detach(_enemy);
     }
 
-    private void Fight()
+    private void Fight(AttackType type)
     {
-        _fightResult.text = _allCountPowerPlayer >= _enemy.Power ? "Win" : "Lose";
+        switch (type)
+        {
+            case AttackType.None:
+                _fightResult.text = "Choose your weapon";
+                break;
+            case AttackType.Knife:
+                _fightResult.text = _allCountPowerPlayer >= _enemy.Power ? $"You defeated the enemy with {type}" : $"You were stabbed";
+                break;
+            case AttackType.Gun:
+                _fightResult.text = _allCountPowerPlayer >= _enemy.Power ? $"You defeated the enemy with {type}" : $"You were shot";
+                break;
+        }
     }
 
     private void Skip()
@@ -108,7 +132,7 @@ public class FightWindowView : MonoBehaviour
         else
             NotNegativeValueControllerOnDecrease(ref _allCountPowerPlayer);
 
-        ChangeDataWindow(_allCountPowerPlayer, DataType.Power);
+        ChangeDataWindow(DataType.Power, _allCountPowerPlayer);
     }
 
     private void ChangeHealth(bool isAddCount)
@@ -118,7 +142,7 @@ public class FightWindowView : MonoBehaviour
         else
             NotNegativeValueControllerOnDecrease(ref _allCountHealthPlayer);
 
-        ChangeDataWindow(_allCountHealthPlayer, DataType.Health);
+        ChangeDataWindow(DataType.Health, _allCountHealthPlayer);
     }
 
     private void ChangeMoney(bool isAddCount)
@@ -128,9 +152,9 @@ public class FightWindowView : MonoBehaviour
         else
             NotNegativeValueControllerOnDecrease(ref _allCountMoneyPlayer);
 
-        ChangeDataWindow(_allCountMoneyPlayer, DataType.Money);
+        ChangeDataWindow(DataType.Money, _allCountMoneyPlayer);
     }
-
+      
     private void ChangeCrimeRate(bool isAddCount)
     {
         if (isAddCount)
@@ -143,7 +167,13 @@ public class FightWindowView : MonoBehaviour
         else
             NotNegativeValueControllerOnDecrease(ref _allCrimeRate);
 
-        ChangeDataWindow(_allCrimeRate, DataType.Crime);
+        ChangeDataWindow(DataType.Crime, _allCrimeRate);
+    }
+
+    private void ChangeAttackType(AttackType type)
+    {
+        _playerAttackType = type;
+        ChangeDataWindow(DataType.Attack, default);
     }
 
     private void NotNegativeValueControllerOnDecrease(ref int value)
@@ -153,10 +183,10 @@ public class FightWindowView : MonoBehaviour
 
     private void ChangeSkipButtonStatus(int value)
     {
-        _skipButton.interactable = value > 2 ? false : true;
+        _skipButton.interactable = value > _crimeRateValueToLoseOpportunityToMissTheFight ? false : true;
     }
 
-    private void ChangeDataWindow(int countChangeData, DataType dataType)
+    private void ChangeDataWindow(DataType dataType, int countChangeData = 0)
     {
         switch (dataType)
         {
@@ -179,8 +209,13 @@ public class FightWindowView : MonoBehaviour
                 _crime.CountCrime = countChangeData;
                 ChangeSkipButtonStatus(countChangeData);
                 break;
+            case DataType.Attack:
+                _attackTypePlayerText.text = $"Attack Type: {_playerAttackType}";
+                _attackTypeEnemyText.text = $"Enemy Attack Type: {_playerAttackType}";
+                break;
         }
 
-        _countPowerEnemyText.text = $"Enemy power: {_enemy.Power}";
+        _fightResult.text = "";
+        _countPowerEnemyText.text = $"Enemy Power: {_enemy.Power}";        
     }
 }
