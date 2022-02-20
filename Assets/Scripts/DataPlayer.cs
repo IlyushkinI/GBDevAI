@@ -7,6 +7,7 @@ public class DataPlayer
     private int _countMoney;
     private int _countHealth;
     private int _countPower;
+    private int _countWanted;
 
     private List<IEnemy> _enemies = new List<IEnemy>();
 
@@ -56,6 +57,19 @@ public class DataPlayer
         }
     }
 
+    public int CountWanted
+    {
+        get => _countWanted;
+        set
+        {
+            if (_countWanted !=value)
+            {
+                _countWanted = value;
+                Notifier(DataType.Wanted);
+            }
+        }
+    }
+
     public void Attach(IEnemy enemy)
     {
         _enemies.Add(enemy);
@@ -90,6 +104,13 @@ public class Health : DataPlayer
 public class Power : DataPlayer
 {
     public Power(string titleData) : base(titleData)
+    {
+    }
+}
+
+public class Wanted : DataPlayer
+{
+    public Wanted(string titleData) : base(titleData)
     {
     }
 }

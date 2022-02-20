@@ -7,6 +7,7 @@ public class Enemy : IEnemy
     private int _moneyPlayer;
     private int _healthPlayer;
     private int _powerPlayer;
+    private int _wantedPlayer;
 
     public Enemy(string name)
     {
@@ -27,6 +28,10 @@ public class Enemy : IEnemy
 
             case DataType.Power:
                 _powerPlayer = dataPlayer.CountPower;
+                break;
+
+            case DataType.Wanted:
+                _wantedPlayer = dataPlayer.CountWanted;
                 break;
         }
 
